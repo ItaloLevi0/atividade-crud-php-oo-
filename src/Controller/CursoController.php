@@ -3,11 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Controller;
-use App\Repository\CursoRepository;
-use App\Repository\CategoriaRepository;
 use App\Model\Curso;
-
-
+use App\Repository\CategoriaRepository;
+use App\Repository\CursoRepository;
+use Dompdf\Dompdf;
 use Exception;
 
 
@@ -94,5 +93,65 @@ class CursoController extends AbstractController
             }
             $this->redirect('/cursos/listar');
         }
+    }
+
+    public function relatorio(): void
+    {
+        date_default_timezone_set('America/Sao_Paulo');
+        $hoje = date('d/m/Y');
+        $cursos = $this->repository->buscarTodos();
+        $this->categoriaRepository = new CategoriaRepository;
+        $categorias = $this->categoriaRepository->buscarTodos();
+        $corpotabela = '';
+        foreach($cursos as $cadaCurso){
+            foreach($categorias as $cadaCategoria){
+                if($cadaCurso[5] == $cadaCategoria->id){
+                    $colunaCategoria = $cadaCategoria->nome;
+                }
+                if ($cadaCurso[4] == 1) {
+                    $cadaCurso[4] = "Ativo";
+                } else {
+                    $cadaCurso[4] = "Desativado";
+                }
+            }
+            $corpotabela .= "
+            <tr>
+                <td>{$cadaCurso[0]}</td>
+                <td>{$cadaCurso[1]}</td>
+                <td>{$cadaCurso[2]}</td>
+                <td>{$cadaCurso[3]}</td>
+                <td>{$cadaCurso[4]}</td>
+                <td>{$colunaCategoria}</td>
+            </tr> ";
+        } 
+
+        $design =  "
+            <h1>Relatorio de Cursos</h1>
+            <hr>
+            <em>Gerado em {$hoje}</em>
+            <br>
+            <table border='1' width='100%' style='margin-top: 30px; text-align:center;'>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Carga Horaria</th>
+                        <th>Descrição</th>
+                        <th>Status</th>
+                        <th>Categoria</th>
+                    </tr>
+                </thead>
+                <tbody>" 
+                . 
+                    $corpotabela 
+                . 
+                "</tbody>
+            </table>
+        ";
+        $dompdf = new Dompdf();
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->loadHtml($design);
+        $dompdf->render();
+        $dompdf->stream('relatorio-de-cursos.pdf', ['Attachment' => 0]);
     }
 }
