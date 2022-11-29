@@ -64,14 +64,14 @@ CREATE TABLE tb_categorias (
 
 INSERT INTO tb_categorias (nome) 
 VALUES 
-('Profissionalizante'),
-('Tecnico'),
-('Graduação');
+('Data analytics'),
+('Marketing'),
+('Fullstack');
 
 INSERT INTO tb_cursos
 (nome, cargaHoraria, descricao, status, categoria_id)
 VALUES
-('FullStack','192','Vai ficar profissional',1,1);
+('FullStack','192','Vai se tornar garoto de programa',1,3);
 
 SELECT *
 FROM tb_cursos
