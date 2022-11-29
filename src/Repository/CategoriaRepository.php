@@ -53,7 +53,7 @@ class CategoriaRepository
     public function atualizar(object $novosDados, string $id): object
     {
         $sql = "UPDATE " . self::TABLE . 
-            " SET nome='{$novosDados->nome}' WHERE id = '{$id}';";
+            " SET nome= '{$novosDados->nome}' WHERE id = '{$id}';";
 
         $this->pdo->query($sql);
 

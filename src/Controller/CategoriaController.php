@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Model\Categoria;
 use App\Repository\CategoriaRepository;
+use Exception;
 
 
 
@@ -37,6 +38,15 @@ class CategoriaController extends AbstractController
         $categoria = new Categoria();
         $categoria->nome = $_POST['nome'];
 
+        try{
+            $this->repository->inserir($categoria);
+        } catch(Exception $exception){
+            if(str_contains($exception->getMessage(), 'nome')){
+                die('A categoria já existe');
+            }
+            die('Vish, aconteceu um erro');
+        }
+
         $this->redirect('/categorias/listar');
     }
 
@@ -48,6 +58,16 @@ class CategoriaController extends AbstractController
         $this->render('categoria/editar', [$categoria]);
         if (false === empty($_POST)) {
             $categoria->nome = $_POST['nome'];
+
+            try{
+                $this->repository->atualizar($categoria, $id);
+            } catch(Exception $exception){
+                if(str_contains($exception->getMessage(), 'nome')){
+                    die('A categoria já existe');
+                }
+
+                die('Vish, aconteceu um erro');
+            }
     
            
             $this->redirect('/categorias/listar');
